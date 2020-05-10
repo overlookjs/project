@@ -13,7 +13,7 @@ Where to file issues:
 
 ## Roadmap
 
-See [roadmap.md](https://github.com/overlookjs/project/blob/master/roadmap.md)
+See [roadmap.md](./roadmap.md)
 
 ## Open issues
 
@@ -21,7 +21,7 @@ See [roadmap.md](https://github.com/overlookjs/project/blob/master/roadmap.md)
 
 ## Changelog
 
-See [changelog.md](https://github.com/overlookjs/project/blob/master/changelog.md)
+See [changelog.md](./changelog.md)
 
 ## Contribution
 
