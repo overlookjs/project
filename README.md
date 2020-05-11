@@ -13,7 +13,9 @@ Where to file issues:
 
 ## Roadmap
 
-See [roadmap.md](./roadmap.md)
+* [Build](./build/index.md)
+* [Files](./files/index.md)
+* Everything else TBC
 
 ## Open issues
 
