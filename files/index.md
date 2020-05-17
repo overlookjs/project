@@ -62,7 +62,9 @@ Same as above, but file doesn't exist in source. It is created dynamically durin
 
 This requires a virtual file system. Should probably be a separate module from [@overlook/plugin-build](https://www.npmjs.com/package/@overlook/plugin-build)), as could be used even if app is not being built e.g. if files need to be created to be later `require()`ed / `import()`ed (e.g. React components).
 
-`[WRITE_FILE]()` is used to write a file to virtual file system. NB method is sync as file is not actually written to disc, just held in memory.
+`[WRITE_FILE]()` is used to write a file to virtual file system.
+
+`[WRITE_FILE]()` could be sync as file is not actually written to disc, just held in memory, but better to make it async to allow for future extension (e.g. actually writing files to a temp folder which can be cached across runs).
 
 [@overlook/plugin-fs](https://www.npmjs.com/package/@overlook/plugin-fs)'s `[READ_FILE]()` method would be extended in virtual fs plugin to read from virtual file system.
 
@@ -74,7 +76,7 @@ const BuildFsVirtualRoute = Route.extend( fsPlugin )
 class MyRoute extends BuildFsVirtualRoute {
   async [INIT_ROUTE]() {
     await super[INIT_ROUTE]();
-    this[WRITE_FILE](
+    await this[WRITE_FILE](
       './foo.html',
       '<html><body>Hello!</body></html>'
     );

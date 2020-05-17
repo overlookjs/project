@@ -17,7 +17,13 @@ This is problematic when the code includes functions - function scope etc cannot
 
 ## TLDR
 
-[Solution 5](#implementation-of-5) is best balance of decent API and simple(ish) implementation, to start with.
+* [Solution 6/7](#implementation-of-6-or-7) is best API but quite complex to implement.
+* [Solution 5](#implementation-of-5) is good balance of decent API and simple(ish) implementation.
+
+Either:
+
+1. implement [Solution 5](#implementation-of-5) to start with or...
+2. go for [Solution 6/7](#implementation-of-6-or-7) straight away.
 
 ## Possible APIs
 
@@ -212,6 +218,13 @@ To a degree, this exists already. Route classes have a property `[EXTENSIONS]` w
 
 However, what's not apparent from `[EXTENSIONS]` is what plugins were applied within other plugins (i.e. nested dependencies). Would need to alter `Route.extend()` to track further calls to `.extend()` within `extend()` function (i.e. applying a nested dependency plugin) and record this on the Route, to be able to make it work.
 
-It would *not* support ad hoc Route class extension (`class extends MyRoute { ... }`) in user code, as this code could not be loaded from any file.
+It would *not* support all ad hoc Route class extension (`class extends MyRoute { ... }`) in user code, as this code could not be imported from any file.
 
-**CONCLUSION:** Nice API but trickier to implement and might cause confusion due to impossibility of ad hoc Route class extension which makes sense to write but cannot be serialized.
+However, could have limited support for ad hoc extensions, by calling `.toString()` on `Route` or `route.constructor` to get the Javascript code. Restrictions would be:
+
+1. Class extension cannot reference external scope (i.e. functions or vars defined outside the class definition)
+2. Symbols used would need to be from plugins used by the Route class, or named so they are trackable (see [here](../build/index.md#user-defined-symbols])).
+
+A fuller implementation could do a bit better than this by parsing the code of the file the custom class extension is defined to locate vars in scope and then extract this code with tree-shaking to remove everything else.
+
+**CONCLUSION:** Nice API but trickier to implement.
