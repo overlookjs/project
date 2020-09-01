@@ -14,6 +14,7 @@ Where to file issues:
 ## Roadmap
 
 * [Build](./build/index.md)
+* [React](./react/index.md)
 * [Files](./files/index.md)
 * Everything else TBC
 
