@@ -22,9 +22,10 @@ Exports `React` at `@overlook/plugin-react/react`.
 
 Augments Route with `[REACT_FILE]` property. This prop should contain path to file to use as page for React.
 
-If `[FILES].jsx` exists, that path is used as `[REACT_FILE]`.
+In `[INIT_ROUTE]()`:
 
-If route does not also use `plugin-react-root`, locates closest route above (or self) using `plugin-react-router`. Call `[REGISTER_ROUTE]()` with `[REACT_FILE]` and `[URL_PATH]`.
+* If `[FILES].jsx` exists, that path is used as `[REACT_FILE]` via a method `[GET_REACT_FILE]()`.
+* If route does not also use `plugin-react-root`, locates closest route above (or self) using `plugin-react-router`. If found, call `[REGISTER_ROUTE]()` with `[REACT_FILE]` and `[URL_PATH]` on router route.
 
 ### `plugin-react-root`
 
@@ -32,9 +33,19 @@ Used for root route in React app.
 
 Exports `ReactDOM` at `@overlook/plugin-react-root/react-dom` + `ReactDOMServer` at `@overlook/plugin-react-root/react-dom/server`.
 
-1. Passes `[REACT_FILE]` to `plugin-bundle` as entry point using `[REGISTER_ENTRY]()`.
-2. If HTML file does not already exist, creates one and registers it as a virtual file (using bundle path returned from `plugin-webpack`).
-3. Provides `.handle()` / `[HANDLE_ROUTE]()` method to serve HTML file.
+In `[INIT_CHILDREN]()`:
+
+* Call `[GET_REACT_ROOT_FILE]()`.
+* Pass path to `plugin-bundle` as entry point using `[REGISTER_ENTRY]()`.
+
+Purpose of `[GET_REACT_ROOT_FILE]()` rather than just using `[REACT_FILE]` is to allow this plugin and `plugin-react-router` to be stacked in any order.
+
+In `[BUNDLE]()` (i.e. after bundling complete):
+
+* If HTML file does not already exist, create one.
+* Register HTML file as virtual file (using bundle path obtained from `plugin-webpack`'s `[BUNDLE_ENTRIES]`).
+
+Provide `.handle()` / `[HANDLE_ROUTE]()` method to serve HTML file.
 
 ### `plugin-react-router`
 
@@ -42,24 +53,47 @@ Provides `[REGISTER_ROUTE]()` method to receive paths to nested routes. NB `plug
 
 In `[INIT_CHILDREN]()`:
 
-* Create a router file and save as virtual file with extension `.router.jsx`.
-* Record router file's path as `[REACT_FILE]`.
+* Call `[INIT_REACT_ROUTER]()`
+
+In `[GET_REACT_ROOT_FILE]()`:
+
+* Call `[INIT_REACT_ROUTER]()`
+* Return `[REACT_FILE]`
+
+`[INIT_REACT_ROUTER]()`:
+
+* Call `[GET_REACT_ROUTER_FILE]()` if `[REACT_ROUTER_FILE]` not already set, and record result as `[REACT_ROUTER_FILE]`.
+* If `[REACT_ROUTER_FILE]` still unset:
+  * Call `[CREATE_REACT_ROUTER]()`.
+  * Record router file's path as `[REACT_ROUTER_FILE]`.
+  * Record router file's path as `[REACT_FILE]`.
 * If route does not also use `plugin-react-root`, call closest route above using `plugin-react-router`. Call `[REGISTER_ROUTE]()` with `[REACT_FILE]` and `[URL_PATH]`.
+
+`[CREATE_REACT_ROUTER]()`:
+
+* Create a router file and save as virtual file with extension `.router.jsx`.
+* Return path.
+
+`[GET_REACT_ROUTER_FILE]()`:
+
+* Return `undefined` (intended to be overridden in plugins)
 
 ### `plugin-bundle`
 
-Provides `[REGISTER_ENTRY]()` method:
+`[REGISTER_ENTRY]()`:
 
-* Receives path to entry point
-* Returns file path for bundle file
+* Receive path to entry point
 
-**TODO:** If bundle filename includes hash, it cannot be known ahead of compilation. How to deal with this?
+In `INIT_CHILDREN()`:
 
-In `[INIT_CHILDREN]()`:
+* Call `[BUNDLE]()`
 
-* Bundle application with Webpack.
+`[BUNDLE]()`:
+
+* Bundle app with Webpack.
 * Inject virtual files into Webpack as if they're real files.
 * Save all output files as virtual files in `public` directory (or does it pass them direct to route which uses `plugin-static-dir`?)
+* Save mapping of entry point paths to bundle file paths in `[BUNDLE_ENTRIES]`.
 
 ### `plugin-virtual-fs`
 
@@ -76,6 +110,8 @@ Could alternatively be called `plugin-public`.
 * Include virtual files which have been added to the dir.
 
 **TODO:** How to implement?
+
+**TODO:** How to handle virtual files which may be added late (in `[INIT_CHILDREN]()`)?
 
 ### `plugin-load-react`
 
