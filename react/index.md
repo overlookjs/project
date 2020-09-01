@@ -116,7 +116,3 @@ Could alternatively be called `plugin-public`.
 ### `plugin-load-react`
 
 Loader plugin. If route has a `.jsx` file but no `.js` file, create Route using `plugin-react`.
-
-## Other changes required
-
-`plugin-path` needs to record `[URL_PATH]` containing URL path. Or `plugin-react` needs to extend `[INIT_ROUTE]()` to create `[URL_PATH]`.
