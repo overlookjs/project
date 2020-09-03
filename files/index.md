@@ -23,7 +23,7 @@ See [here](./virtualRoutes.md).
 
 If app is to be built, need to signal to Overlook that the file should be included in the build.
 
-`[INCLUDE_FILE]()` method would be provided by [@overlook/plugin-build](https://www.npmjs.com/package/@overlook/plugin-build). It should be called during init to signal that this file needs to be included in the build.
+`[BUILD_FILE]()` method would be provided by [@overlook/plugin-build](https://www.npmjs.com/package/@overlook/plugin-build). It should be called during init to signal that this file needs to be included in the build.
 
 `[READ_FILE]()` method would be provided by [@overlook/plugin-fs](https://www.npmjs.com/package/@overlook/plugin-fs)). It would read a file's contents. `fs.readFile()` could alternatively be used, but wouldn't work for [virtual files](#virtual-server-side-associate-files).
 
@@ -35,7 +35,7 @@ const Route = require('@overlook/route'),
 const fsPlugin = require('@overlook/plugin-fs'),
   { READ_FILE } = fsPlugin;
 const buildPlugin = require('@overlook/plugin-build'),
-  { INCLUDE_FILE } = buildPlugin;
+  { BUILD_FILE } = buildPlugin;
 const { RES } = require('@overlook/plugin-request');
 
 const BuildFsRoute = Route.extend( fsPlugin )
@@ -44,11 +44,11 @@ const BuildFsRoute = Route.extend( fsPlugin )
 class MyRoute extends BuildFsRoute {
   async [INIT_ROUTE]() {
     await super[INIT_ROUTE]();
-    this[INCLUDE_FILE]( './foo.html' );
+    this[BUILD_FILE]( './foo.html' );
   }
 
   async handle(req) {
-    // Thanks to `[INCLUDE_FILE]()` call,
+    // Thanks to `[BUILD_FILE]()` call,
     // this file will be present in the build.
     const contents = await this[READ_FILE]('./foo.html');
     req[RES].end( contents );
@@ -80,7 +80,7 @@ class MyRoute extends BuildFsVirtualRoute {
       './foo.html',
       '<html><body>Hello!</body></html>'
     );
-    this[INCLUDE_FILE]( './foo.html' );
+    this[BUILD_FILE]( './foo.html' );
   }
 
   async handle(req) {
@@ -90,7 +90,7 @@ class MyRoute extends BuildFsVirtualRoute {
 }
 ```
 
-Perhaps a method `[WRITE_INCLUDE_FILE]()` method could be provided as a shortcut for calling `[WRITE_FILE]()` followed by `[INCLUDE_FILE]()`.
+Perhaps a method `[WRITE_BUILD_FILE]()` method could be provided as a shortcut for calling `[WRITE_FILE]()` followed by `[BUILD_FILE]()`.
 
 How virtual file system is implemented TBC.
 
@@ -104,6 +104,6 @@ This would be required for React server-side rendering.
 
 ### Client-side files
 
-Same as [server-side associate files](#server-side-associate-files) and [virtual files](#virtual-server-side-associate-files), except `[INCLUDE_FILE]()` would not be called, as it doesn't need to be in build. Instead, whatever is creating the client-side build (e.g. Webpack) would create the client-side build and write it as virtual files to a public folder and *it* would call `[INCLUDE_FILE]()` to include the client-side bundle in the build.
+Same as [server-side associate files](#server-side-associate-files) and [virtual files](#virtual-server-side-associate-files), except `[BUILD_FILE]()` would not be called, as it doesn't need to be in build. Instead, whatever is creating the client-side build (e.g. Webpack) would create the client-side build and write it as virtual files to a public folder and *it* would call `[BUILD_FILE]()` to include the client-side bundle in the build.
 
 Need to think about how paths are handled when [@overlook/plugin-build](https://www.npmjs.com/package/@overlook/plugin-build) is not used. Are paths relative or absolute? Relative to what?
