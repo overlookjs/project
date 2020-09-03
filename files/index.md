@@ -23,7 +23,7 @@ See [here](./virtualRoutes.md).
 
 If app is to be built, need to signal to Overlook that the file should be included in the build.
 
-`[INCLUDE_FILE]()` method would be provided by [@overlook/plugin-build](https://www.npmjs.com/package/@overlook/plugin-build). It should be called during init to signal record that this file needs to be included in the build.
+`[INCLUDE_FILE]()` method would be provided by [@overlook/plugin-build](https://www.npmjs.com/package/@overlook/plugin-build). It should be called during init to signal that this file needs to be included in the build.
 
 `[READ_FILE]()` method would be provided by [@overlook/plugin-fs](https://www.npmjs.com/package/@overlook/plugin-fs)). It would read a file's contents. `fs.readFile()` could alternatively be used, but wouldn't work for [virtual files](#virtual-server-side-associate-files).
 
