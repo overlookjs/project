@@ -27,11 +27,20 @@ In `[INIT_ROUTE]()`:
 * If `[FILES].jsx` exists, that file is used as `[REACT_FILE]` via a method `[GET_REACT_FILE]()`.
 * If route does not also use `plugin-react-root`, locates closest route above (or self) using `plugin-react-router`. If found, call `[ADD_ROUTE]()` with `[REACT_FILE]` and `[URL_PATH]` on router route.
 
+Also need to provide `.handle` / `[HANDLE_ROUTE]` method to either:
+
+1. pass requests to React root route to handle (so it serves HTML file)
+2. inherit `[STATIC_FILE]` from React root route, and serve it itself
+
+A smarter implementation would be able to determine what lazy-loaded bundles are required for each specific route, and create a different HTML file for each including pre-loading those bundles. All HTML files could be put in `public` directory.
+
 ### `plugin-react-root`
 
 Used for root route in React app.
 
 Exports `ReactDOM` at `@overlook/plugin-react-root/react-dom` + `ReactDOMServer` at `@overlook/plugin-react-root/react-dom/server`.
+
+Extends `plugin-static` to serve HTML file.
 
 In `[INIT_CHILDREN]()`:
 
@@ -45,8 +54,6 @@ In `[BUNDLE]()` (i.e. after bundling complete):
 * Create virtual HTML file (using bundle path obtained from `plugin-bundle`'s `[BUNDLE_ENTRIES]`).
 * Set HTML file as `[STATIC_FILE]`
 * Add HTML file to `public` dir
-
-Provide `.handle()` / `[HANDLE_ROUTE]()` method to serve HTML file.
 
 ### `plugin-react-router`
 
